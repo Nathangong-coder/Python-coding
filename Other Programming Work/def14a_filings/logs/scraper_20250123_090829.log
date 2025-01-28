@@ -1,0 +1,21 @@
+2025-01-23 09:08:29,292 - INFO - Processing 3 companies
+2025-01-23 09:08:29,294 - INFO - Processing CIK 0000320193
+2025-01-23 09:08:29,295 - INFO - Processing CIK 0000789019
+2025-01-23 09:08:29,295 - INFO - Processing CIK 0001652044
+2025-01-23 09:08:29,846 - INFO - Backing off _make_request(...) for 0.7s (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:29,913 - INFO - Backing off _make_request(...) for 0.9s (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001652044&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:29,965 - INFO - Backing off _make_request(...) for 0.2s (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000789019&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:30,561 - INFO - Backing off _make_request(...) for 1.5s (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000789019&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:31,066 - INFO - Backing off _make_request(...) for 0.9s (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:31,207 - INFO - Backing off _make_request(...) for 0.3s (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001652044&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:31,913 - ERROR - Giving up _make_request(...) after 3 tries (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001652044&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:31,914 - ERROR - Error getting filing links for CIK 0001652044: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001652044&type=DEF+14A&dateb=&owner=exclude&count=5
+2025-01-23 09:08:32,292 - ERROR - Giving up _make_request(...) after 3 tries (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000789019&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:32,293 - ERROR - Error getting filing links for CIK 0000789019: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000789019&type=DEF+14A&dateb=&owner=exclude&count=5
+2025-01-23 09:08:32,347 - ERROR - Giving up _make_request(...) after 3 tries (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=DEF+14A&dateb=&owner=exclude&count=5)
+2025-01-23 09:08:32,347 - ERROR - Error getting filing links for CIK 0000320193: 403 Client Error: Forbidden for url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=DEF+14A&dateb=&owner=exclude&count=5
+2025-01-23 09:08:33,176 - INFO - Backing off _make_request(...) for 0.5s (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/files/company_tickers.json)
+2025-01-23 09:08:33,927 - INFO - Backing off _make_request(...) for 1.1s (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/files/company_tickers.json)
+2025-01-23 09:08:35,308 - ERROR - Giving up _make_request(...) after 3 tries (requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://www.sec.gov/files/company_tickers.json)
+2025-01-23 09:08:35,309 - ERROR - Error getting company CIKs: 403 Client Error: Forbidden for url: https://www.sec.gov/files/company_tickers.json
+2025-01-23 09:08:35,311 - INFO - Processing 0 companies

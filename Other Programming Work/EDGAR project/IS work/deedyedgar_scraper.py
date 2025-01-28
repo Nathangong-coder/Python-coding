@@ -292,15 +292,15 @@ def main():
     from dotenv import load_dotenv
     load_dotenv()
 
-    email = os.getenv("SEC_EMAIL")
+    email = os.getenv('ngong@eastsideprep.org','ngong@eastsideprep.org')
     if not email:
         raise ValueError("Please set SEC_EMAIL in .env file")
 
     scraper = EDGARScraper(email)
 
     # Optional: Process specific CIKs
-    # test_ciks = ['0000320193', '0000789019', '0001652044']  # Apple, Microsoft, Google
-    # scraper.run(test_ciks)
+    test_ciks = ['0000320193', '0000789019', '0001652044']  # Apple, Microsoft, Google
+    scraper.run(test_ciks)
 
     # Or process all companies
     scraper.run()
