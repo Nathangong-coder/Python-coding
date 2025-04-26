@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import logging
 import json
+import csv
 from typing import Optional, List, Dict
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -90,21 +91,27 @@ class EDGARScraper:
     def get_company_ciks(self) -> List[str]:
         """Get list of company CIKs from SEC"""
         try:
-            url = "https://www.sec.gov/files/company_tickers.json"
-            response = self._make_request(url)
-            data = response.json()
-
-            # Convert to DataFrame and zero-pad CIKs to 10 digits
-            df = pd.DataFrame.from_dict(data, orient='index')
+            #hiding this so I can start coding the rest of my stuff
+            #url = "https://www.sec.gov/files/company_tickers.json"
+            #response = self._make_request(url)
+            #data = response.json()
+            
+            df=pd.read_excel("C:/Users/NGong/Downloads/Independent Study Stuff/annual_firm_level_Darmouni_Mota_existingfile.xlsx",sheet_name='Tech CIK')
+            # Convert the column to numeric, coercing errors to NaN for non-integer values
+            df["cik_str"] = pd.to_numeric(df["industry"], errors='coerce')
+            # Drop rows where 'ID' is NaN (i.e., non-integer values)
+            df = df.dropna(subset=["cik_str"])
+            # Convert back to integer if needed
+            df["cik_str"] = df["cik_str"].astype(int)
             df['cik_str'] = df['cik_str'].astype(str).str.zfill(10)
-
-            # Save to database
+            df['title']=df["industry.1"]
+            #Save to database
             with sqlite3.connect(self.db_path) as conn:
-                for _, row in df.iterrows():
+               for _, row in df.iterrows():
                     conn.execute('''
                         INSERT OR REPLACE INTO companies (cik, name)
                         VALUES (?, ?)
-                    ''', (row['cik_str'], row['title']))
+                        ''', (row['cik_str'], row['title']))
 
             return df['cik_str'].tolist()
         except Exception as e:
@@ -307,3 +314,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    
