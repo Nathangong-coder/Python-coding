@@ -120,7 +120,7 @@ financial_df = pd.concat(financial_data_list, ignore_index=True)
 print(financial_df)
 
 # Save to CSV
-financial_df.to_csv("financial_data_AlphaVantageFinancialInfo_big5Companies.csv", index=False)
+financial_df.to_csv("financial_data_AlphaVantageFinancialInfo_big5Companies3.csv", index=False)
 print("✅ Data successfully saved!")
 
 #TO DO: figure out how saving to CSV can be in certain folders (too many CSVs, getting messy, even for me)
