@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek AI Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            position: absolute;
+            top: 15px;
+            left: 20px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .user .message-avatar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .assistant .message-avatar {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .user .message-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .assistant .message-content {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            transition: border-color 0.2s ease;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 14px;
+            padding: 12px 16px;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .chat-container {
+                height: calc(100vh - 20px);
+                border-radius: 15px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <div class="controls">
+                <button class="control-btn" id="clearBtn">Clear Chat</button>
+                <button class="control-btn" id="exportBtn">Export</button>
+            </div>
+            <div class="status-indicator" id="statusIndicator"></div>
+            <h1>DeepSeek AI Chat</h1>
+            <p>Powered by DeepSeek API • Persistent across devices</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages will be loaded here -->
+        </div>
+        
+        <div class="loading" id="loadingIndicator">
+            <div class="loading-spinner"></div>
+            <span>AI is thinking...</span>
+        </div>
+        
+        <div class="input-area">
+            <div class="input-container">
+                <textarea 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Type your message here..."
+                    rows="1"
+                ></textarea>
+                <button class="send-button" id="sendButton">
+                    <span>Send</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class DeepSeekChat {
+            constructor() {
+                this.apiUrl = '/api/deepseek-chat'; // Use backend proxy
+                this.messages = [];
+                this.isOnline = true;
+                this.init();
+                this.checkServerHealth();
+                this.loadChatHistory();
+            }
+
+            init() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.loadingIndicator = document.getElementById('loadingIndicator');
+                this.statusIndicator = document.getElementById('statusIndicator');
+                this.clearBtn = document.getElementById('clearBtn');
+                this.exportBtn = document.getElementById('exportBtn');
+
+                // Event listeners
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.clearBtn.addEventListener('click', () => this.clearChat());
+                this.exportBtn.addEventListener('click', () => this.exportChat());
+                
+                this.messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+
+                // Auto-resize textarea
+                this.messageInput.addEventListener('input', () => {
+                    this.messageInput.style.height = 'auto';
+                    this.messageInput.style.height = Math.min(this.messageInput.scrollHeight, 120) + 'px';
+                });
+
+                // Check connection periodically
+                setInterval(() => this.checkServerHealth(), 30000);
+            }
+
+            async checkServerHealth() {
+                try {
+                    const response = await fetch('/health');
+                    this.isOnline = response.ok;
+                } catch (error) {
+                    this.isOnline = false;
+                }
+                
+                this.statusIndicator.classList.toggle('offline', !this.isOnline);
+            }
+
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message || this.sendButton.disabled || !this.isOnline) return;
+
+                // Add user message to UI immediately
+                this.addMessageToUI('user', message);
+                this.messageInput.value = '';
+                this.messageInput.style.height = 'auto';
+                
+                // Show loading
+                this.setLoading(true);
+
+                try {
+                    const response = await this.callDeepSeekAPI(message);
+                    this.addMessageToUI('assistant', response);
+                    this.showSuccess('Message sent successfully');
+                } catch (error) {
+                    this.showError('Failed to get response from DeepSeek API. Please try again.');
+                    console.error('API Error:', error);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            async callDeepSeekAPI(userMessage) {
+                // Prepare conversation context
+                const conversationMessages = [
+                    ...this.messages,
+                    { role: 'user', content: userMessage }
+                ];
+
+                const response = await fetch(this.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: conversationMessages,
+                        temperature: 0.7,
+                        max_tokens: 2000
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'API request failed');
+                }
+
+                // Update local messages array
+                this.messages.push(
+                    { role: 'user', content: userMessage },
+                    { role: 'assistant', content: data.response }
+                );
+
+                return data.response;
+            }
+
+            async loadChatHistory() {
+                try {
+                    const response = await fetch('/api/chat-history');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.messages) {
+                            // Clear existing messages in UI
+                            this.chatMessages.innerHTML = '';
+                            
+                            // Convert backend format to frontend format
+                            const messages = [];
+                            data.messages.forEach(msg => {
+                                messages.push({
+                                    role: msg.role,
+                                    content: msg.content
+                                });
+                                this.addMessageToUI(msg.role, msg.content, new Date(msg.timestamp));
+                            });
+                            
+                            this.messages = messages;
+                            this.showSuccess('Chat history loaded successfully');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load chat history:', error);
+                    this.showError('Failed to load chat history');
+                }
+
+                // Show welcome message if no history
+                if (this.messages.length === 0) {
+                    this.addMessageToUI('assistant', 'Hello! I\'m DeepSeek AI. How can I help you today?');
+                }
+            }
+
+            addMessageToUI(role, content, timestamp = new Date()) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${role}`;
+                
+                const timeStr = timestamp.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">${role === 'user' ? 'You' : 'AI'}</div>
+                    <div class="message-content">
+                        ${this.formatMessage(content)}
+                        <div class="message-time">${timeStr}</div>
+                    </div>
+                `;
+
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            formatMessage(content) {
+                // Enhanced formatting for better display
+                return content
+                    .replace(/\n/g, '<br>')
+                    .replace(/`([^`]+)`/g, '<code style="background: #f3f4f6; padding: 2px 4px; border-radius: 4px; font-family: monospace;">$1</code>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            }
+
+            async clearChat() {
+                if (!confirm('Are you sure you want to clear all chat history? This cannot be undone.')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/chat-history', {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        this.messages = [];
+                        this.chatMessages.innerHTML = '';
+                        this.addMessageToUI('assistant', 'Chat history cleared. How can I help you today?');
+                        this.showSuccess('Chat history cleared successfully');
+                    } else {
+                        throw new Error('Failed to clear chat history');
+                    }
+                } catch (error) {
+                    console.error('Error clearing chat:', error);
+                    this.showError('Failed to clear chat history');
+                }
+            }
+
+            exportChat() {
+                if (this.messages.length === 0) {
+                    this.showError('No messages to export');
+                    return;
+                }
+
+                const chatData = {
+                    exported_at: new Date().toISOString(),
+                    message_count: this.messages.length,
+                    messages: this.messages
+                };
+
+                const blob = new Blob([JSON.stringify(chatData, null, 2)], {
+                    type: 'application/json'
+                });
+
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `deepseek-chat-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                this.showSuccess('Chat exported successfully');
+            }
+
+            setLoading(loading) {
+                this.sendButton.disabled = loading;
+                this.loadingIndicator.classList.toggle('show', loading);
+                if (loading) {
+                    this.scrollToBottom();
+                }
+            }
+
+            showError(message) {
+                this.showNotification(message, 'error');
+            }
+
+            showSuccess(message) {
+                this.showNotification(message, 'success');
+            }
+
+            showNotification(message, type) {
+                // Remove existing notifications
+                const existing = document.querySelectorAll('.error-message, .success-message');
+                existing.forEach(el => el.remove());
+
+                const notificationDiv = document.createElement('div');
+                notificationDiv.className = `${type}-message`;
+                notificationDiv.textContent = message;
+                this.chatMessages.appendChild(notificationDiv);
+                this.scrollToBottom();
+
+                // Remove notification after 3 seconds
+                setTimeout(() => {
+                    if (notificationDiv.parentNode) {
+                        notificationDiv.parentNode.removeChild(notificationDiv);
+                    }
+                }, 3000);
+            }
+
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }, 100);
+            }
+        }
+
+        // Initialize the chat application
+        document.addEventListener('DOMContentLoaded', () => {
+            new DeepSeekChat();
+        });
+    </script>
+</body>
+</html>
